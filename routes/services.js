@@ -7,17 +7,39 @@ const router = express.Router();
 
 router.get('/services', async (req, res) => {
     try {
-      const { status } = req.query; 
-      const query = status ? { status } : {};
-      
-      const services = await Service.find(query)
-        .populate('id_user')  
-        .populate('id_prof'); 
-      
-      res.status(200).json(services);
+
+      const { email_user, email_prof, valor, hora, loc, status, descricao } = req.query;
+
+      const user = await User.findOne({ email: email_user });
+      const professional = await Professional.findOne({ email: email_prof });
+  
+      if (!user) {
+        return res.status(404).json({ message: "Cliente não encontrado" });
+      }
+      if (!professional) {
+        return res.status(404).json({ message: "Profissional não encontrado" });
+      }
+
+      const service = await Service.findOne({
+        id_user: user._id,
+        id_prof: professional._id,
+        valor,
+        hora,
+        loc,
+        status,
+        descricao,
+      })
+        .populate('id_user')
+        .populate('id_prof');
+  
+      if (!service) {
+        return res.status(404).json({ message: "Serviço não encontrado" });
+      }
+
+      res.status(200).json(service);
     } catch (error) {
-      console.error('Erro ao buscar serviços:', error);
-      res.status(500).json({ message: 'Erro no servidor' });
+      console.error('Erro ao buscar o serviço:', error);
+      res.status(500).json({ message: 'Erro no servidor', error: error.message });
     }
   });
 
