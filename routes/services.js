@@ -7,10 +7,13 @@ const router = express.Router();
 
 router.get('/services', async (req, res) => {
     try {
-      const services = await Service.find()
+      const { status } = req.query; 
+      const query = status ? { status } : {};
+      
+      const services = await Service.find(query)
         .populate('id_user')  
-        .populate('id_prof');
-  
+        .populate('id_prof'); 
+      
       res.status(200).json(services);
     } catch (error) {
       console.error('Erro ao buscar serviços:', error);

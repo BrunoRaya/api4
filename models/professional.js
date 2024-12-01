@@ -8,6 +8,6 @@ const professionalSchema = new mongoose.Schema({
   address: { type: String, required: true },  
 });
 
-const Professional = mongoose.model('Professional', professionalSchema);
+const Professional = mongoose.model('Professional', professionalSchema, 'professionals');
 
 export default Professional;
