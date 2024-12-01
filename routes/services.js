@@ -14,16 +14,17 @@ router.get('/services', async (req, res) => {
 });
 
 router.post('/services', async (req, res) => {
-  try {
-    const newService = new Service(req.body);
-    await newService.save();
-    res.status(201).json(newService);
-  } catch (error) {
-    console.error('Erro ao criar serviço:', error);
-    res.status(400).json({ message: 'Erro ao criar serviço', error: error.message });
-  }
-});
-
+    try {
+      console.log('Dados recebidos:', req.body);
+      const newService = new Service(req.body);
+      const savedService = await newService.save();
+      res.status(201).json(savedService);
+    } catch (error) {
+      console.error('Erro ao salvar serviço:', error.message);
+      res.status(500).json({ message: 'Erro ao salvar o serviço', error: error.message });
+    }
+  });
+  
 router.get('/services/:id', async (req, res) => {
   try {
     const service = await Service.findById(req.params.id);
