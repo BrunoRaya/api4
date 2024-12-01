@@ -54,7 +54,6 @@ router.patch('/services/:id', async (req, res) => {
   }
 });
 
-// Rota para deletar um serviço
 router.delete('/services/:id', async (req, res) => {
   try {
     const service = await Service.findByIdAndDelete(req.params.id);
