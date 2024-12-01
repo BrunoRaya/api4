@@ -1,28 +1,27 @@
 import express from 'express';
 import Service from '../models/service.js';
+import User from '../models/user.js';  
+import Professional from '../models/professional.js';  
 
 const router = express.Router();
 
-router.get('/services', async (req, res) => {
-  try {
-    const services = await Service.find()
-      .populate('id_user')  
-      .populate('id_prof');
-
-    res.status(200).json(services);
-  } catch (error) {
-    console.error('Erro ao buscar serviços:', error);
-    res.status(500).json({ message: 'Erro no servidor' });
-  }
-});
-
 router.post('/services', async (req, res) => {
   try {
-    const { id_user, id_prof, valor, hora, loc, status, descricao } = req.body;
+    const { email_user, email_prof, valor, hora, loc, status, descricao } = req.body;
+
+    const user = await User.findOne({ email: email_user });
+    if (!user) {
+      return res.status(404).json({ message: 'Cliente não encontrado' });
+    }
+
+    const professional = await Professional.findOne({ email: email_prof });
+    if (!professional) {
+      return res.status(404).json({ message: 'Profissional não encontrado' });
+    }
 
     const newService = new Service({
-      id_user,
-      id_prof,
+      id_user: user._id,  
+      id_prof: professional._id,  
       valor,
       hora,
       loc,
@@ -34,28 +33,12 @@ router.post('/services', async (req, res) => {
 
     const populatedService = await Service.findById(savedService._id)
       .populate('id_user') 
-      .populate('id_prof');  
+      .populate('id_prof');
 
     res.status(201).json(populatedService);
   } catch (error) {
     console.error('Erro ao salvar o serviço:', error.message);
     res.status(500).json({ message: 'Erro ao salvar o serviço', error: error.message });
-  }
-});
-
-router.get('/services/:id', async (req, res) => {
-  try {
-    const service = await Service.findById(req.params.id)
-      .populate('id_user')  
-      .populate('id_prof');  
-
-    if (!service) {
-      return res.status(404).json({ message: 'Serviço não encontrado' });
-    }
-    res.status(200).json(service);
-  } catch (error) {
-    console.error('Erro ao buscar serviço:', error);
-    res.status(500).json({ message: 'Erro no servidor' });
   }
 });
 
