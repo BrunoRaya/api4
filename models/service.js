@@ -1,19 +1,14 @@
 import mongoose from 'mongoose';
 
 const serviceSchema = new mongoose.Schema({
-  id_user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' }, 
-  id_prof: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Professional' }, 
+  id_user: { type: String, required: true }, 
+  id_prof: { type: String, required: true }, 
   valor: { type: Number, required: true }, 
   hora: { type: Date, required: true }, 
   loc: { type: String, required: true }, 
-  status: { 
-    type: String, 
-    required: true, 
-    enum: ['Em progresso', 'Concluído', 'Cancelado'], 
-    default: 'Em progresso',
-  },
+  status: { type: String, required: true, enum: ['Em progresso', 'Concluído', 'Cancelado'] }, 
   descricao: { type: String, required: true }, 
-}, { timestamps: true }); 
+});
 
 const Service = mongoose.model('Service', serviceSchema);
 
