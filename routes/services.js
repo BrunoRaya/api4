@@ -1,6 +1,5 @@
 import express from 'express';
 import Service from '../models/service.js';
-  
 
 const router = express.Router();
 
@@ -9,7 +8,7 @@ router.get('/services', async (req, res) => {
     const services = await Service.find()
       .populate('id_user')  
       .populate('id_prof');
-    
+
     res.status(200).json(services);
   } catch (error) {
     console.error('Erro ao buscar serviços:', error);
@@ -18,35 +17,31 @@ router.get('/services', async (req, res) => {
 });
 
 router.post('/services', async (req, res) => {
-    try {
-      console.log(req.body); 
-      
-      const { id_user, id_prof, valor, hora, loc, status, descricao } = req.body;
-  
-      const newService = new Service({
-        id_user,
-        id_prof,
-        valor,
-        hora,
-        loc,
-        status,
-        descricao,
-      });
-  
-      const savedService = await newService.save();
-      console.log('Service saved:', savedService); 
-  
-      const populatedService = await Service.findById(savedService._id)
-        .populate('id_user')
-        .populate('id_prof');
-  
-      res.status(201).json(populatedService);
-    } catch (error) {
-      console.error('Erro ao salvar o serviço:', error.message);
-      res.status(500).json({ message: 'Erro ao salvar o serviço', error: error.message });
-    }
-  });
-  
+  try {
+    const { id_user, id_prof, valor, hora, loc, status, descricao } = req.body;
+
+    const newService = new Service({
+      id_user,
+      id_prof,
+      valor,
+      hora,
+      loc,
+      status,
+      descricao,
+    });
+
+    const savedService = await newService.save();
+
+    const populatedService = await Service.findById(savedService._id)
+      .populate('id_user') 
+      .populate('id_prof');  
+
+    res.status(201).json(populatedService);
+  } catch (error) {
+    console.error('Erro ao salvar o serviço:', error.message);
+    res.status(500).json({ message: 'Erro ao salvar o serviço', error: error.message });
+  }
+});
 
 router.get('/services/:id', async (req, res) => {
   try {

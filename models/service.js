@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-import User from './user';  
-import Professional from './professional';  
 
 const serviceSchema = new mongoose.Schema({
   id_user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
