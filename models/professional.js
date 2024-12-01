@@ -5,7 +5,7 @@ const professionalSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   profession: { type: String, required: true },
   phone: { type: String, required: true },
-  address: { type: String, required: true },  // Endereço do profissional
+  address: { type: String, required: true },  
 });
 
 const Professional = mongoose.model('Professional', professionalSchema);
