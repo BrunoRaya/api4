@@ -5,14 +5,20 @@ import Professional from '../models/professional.js';
 
 const router = express.Router();
 
+
 router.post('/services', async (req, res) => {
     try {
-
       const { email_user, email_prof, valor, hora, loc, status, descricao } = req.body;
+
+      if (!email_user || !email_prof) {
+        return res.status(400).json({ message: 'Email do usuário e/ou profissional não enviado.' });
+      }
 
       const user = await User.findOne({
         email: { $regex: new RegExp('^' + email_user + '$', 'i') }, 
       });
+  
+      console.log('Usuário encontrado:', user); 
   
       if (!user) {
         return res.status(404).json({ message: 'Cliente não encontrado' });
@@ -21,6 +27,8 @@ router.post('/services', async (req, res) => {
       const professional = await Professional.findOne({
         email: { $regex: new RegExp('^' + email_prof + '$', 'i') },
       });
+  
+      console.log('Profissional encontrado:', professional); 
   
       if (!professional) {
         return res.status(404).json({ message: 'Profissional não encontrado' });
@@ -39,9 +47,9 @@ router.post('/services', async (req, res) => {
       const savedService = await newService.save();
 
       const populatedService = await Service.findById(savedService._id)
-        .populate('id_user')
+        .populate('id_user') 
         .populate('id_prof');
-
+  
       res.status(201).json(populatedService);
     } catch (error) {
       console.error('Erro ao salvar o serviço:', error.message);
