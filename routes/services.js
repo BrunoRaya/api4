@@ -9,19 +9,25 @@ router.post('/services', async (req, res) => {
   try {
     const { email_user, email_prof, valor, hora, loc, status, descricao } = req.body;
 
-    const user = await User.findOne({ email: email_user });
+    const user = await User.findOne({
+      email: { $regex: new RegExp('^' + email_user + '$', 'i') },
+    });
+    
     if (!user) {
       return res.status(404).json({ message: 'Cliente não encontrado' });
     }
 
-    const professional = await Professional.findOne({ email: email_prof });
+    const professional = await Professional.findOne({
+      email: { $regex: new RegExp('^' + email_prof + '$', 'i') },
+    });
+
     if (!professional) {
       return res.status(404).json({ message: 'Profissional não encontrado' });
     }
 
     const newService = new Service({
-      id_user: user._id,  
-      id_prof: professional._id,  
+      id_user: user._id,
+      id_prof: professional._id,
       valor,
       hora,
       loc,
@@ -32,7 +38,7 @@ router.post('/services', async (req, res) => {
     const savedService = await newService.save();
 
     const populatedService = await Service.findById(savedService._id)
-      .populate('id_user') 
+      .populate('id_user')
       .populate('id_prof');
 
     res.status(201).json(populatedService);
