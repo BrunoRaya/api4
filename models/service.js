@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const serviceSchema = new mongoose.Schema({
-  id_user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  id_prof: { type: mongoose.Schema.Types.ObjectId, ref: 'Professional', required: true },
+  email_user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  email_prof: { type: mongoose.Schema.Types.ObjectId, ref: 'Professional', required: true },
   valor: { type: Number, required: true },
   hora: { type: Date, required: true },
   loc: { type: String, required: true },
