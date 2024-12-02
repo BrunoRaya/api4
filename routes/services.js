@@ -5,43 +5,45 @@ import Professional from '../models/professional.js';
 
 const router = express.Router();
 
-router.get('/services', async (req, res) => {
+router.get('/services', express.json(), async (req, res) => {
     try {
+      const { email_user, email_prof, valor, hora, loc, status, descricao } = req.body;
 
-      const { email_user, email_prof, valor, hora, loc, status, descricao } = req.query;
-
-      const user = await User.findOne({ email: email_user });
-      const professional = await Professional.findOne({ email: email_prof });
+      const user = email_user ? await User.findOne({ email: email_user }) : null;
+      const professional = email_prof ? await Professional.findOne({ email: email_prof }) : null;
   
-      if (!user) {
+      if (email_user && !user) {
         return res.status(404).json({ message: "Cliente não encontrado" });
       }
-      if (!professional) {
+      if (email_prof && !professional) {
         return res.status(404).json({ message: "Profissional não encontrado" });
       }
 
-      const service = await Service.findOne({
-        id_user: user._id,
-        id_prof: professional._id,
-        valor,
-        hora,
-        loc,
-        status,
-        descricao,
-      })
+      const filter = {
+        ...(user && { id_user: user._id }),
+        ...(professional && { id_prof: professional._id }),
+        ...(valor && { valor: Number(valor) }),
+        ...(hora && { hora: new Date(hora) }),
+        ...(loc && { loc }),
+        ...(status && { status }),
+        ...(descricao && { descricao }),
+      };
+
+      const services = await Service.find(filter)
         .populate('id_user')
         .populate('id_prof');
   
-      if (!service) {
+      if (services.length === 0) {
         return res.status(404).json({ message: "Serviço não encontrado" });
       }
-
-      res.status(200).json(service);
+  
+      res.status(200).json(services);
     } catch (error) {
-      console.error('Erro ao buscar o serviço:', error);
+      console.error('Erro ao buscar serviços:', error);
       res.status(500).json({ message: 'Erro no servidor', error: error.message });
     }
   });
+  
 
 router.post('/services', async (req, res) => {
     try {
@@ -95,34 +97,5 @@ router.post('/services', async (req, res) => {
       res.status(500).json({ message: 'Erro ao salvar o serviço', error: error.message });
     }
   });
-
-router.put('/services/:id', async (req, res) => {
-  try {
-    const updatedService = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true })
-      .populate('id_user') 
-      .populate('id_prof');
-
-    if (!updatedService) {
-      return res.status(404).json({ message: 'Serviço não encontrado' });
-    }
-    res.status(200).json(updatedService);
-  } catch (error) {
-    console.error('Erro ao atualizar serviço:', error);
-    res.status(400).json({ message: 'Erro ao atualizar serviço', error: error.message });
-  }
-});
-
-router.delete('/services/:id', async (req, res) => {
-  try {
-    const deletedService = await Service.findByIdAndDelete(req.params.id);
-    if (!deletedService) {
-      return res.status(404).json({ message: 'Serviço não encontrado' });
-    }
-    res.status(200).json({ message: 'Serviço excluído com sucesso' });
-  } catch (error) {
-    console.error('Erro ao excluir serviço:', error);
-    res.status(500).json({ message: 'Erro no servidor' });
-  }
-});
 
 export default router;
