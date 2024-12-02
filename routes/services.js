@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/services', express.json(), async (req, res) => {
     try {
       const { email_user, email_prof, valor, hora, loc, status, descricao } = req.body;
-
+  
       const user = email_user ? await User.findOne({ email: email_user }) : null;
       const professional = email_prof ? await Professional.findOne({ email: email_prof }) : null;
   
@@ -18,7 +18,7 @@ router.get('/services', express.json(), async (req, res) => {
       if (email_prof && !professional) {
         return res.status(404).json({ message: "Profissional não encontrado" });
       }
-
+  
       const filter = {
         ...(user && { id_user: user._id }),
         ...(professional && { id_prof: professional._id }),
@@ -30,8 +30,8 @@ router.get('/services', express.json(), async (req, res) => {
       };
 
       const services = await Service.find(filter)
-        .populate('id_user')
-        .populate('id_prof');
+        .populate('id_user', '-password')  
+        .populate('id_prof', '-password -complemento -cep -__v -valor');  
   
       if (services.length === 0) {
         return res.status(404).json({ message: "Serviço não encontrado" });
